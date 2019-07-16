@@ -5,4 +5,5 @@ mod into;
 pub enum Marker {
     PositiveFixInt(u8),
     FixMap(u8),
+    FixArray(u8),
 }
