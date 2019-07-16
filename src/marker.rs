@@ -25,4 +25,5 @@ pub enum Marker {
     UInt64,
     Int8,
     Int16,
+    Int32,
 }
