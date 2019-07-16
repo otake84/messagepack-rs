@@ -33,4 +33,5 @@ pub enum Marker {
     FixExt8,
     FixExt16,
     Str8,
+    Str16,
 }
