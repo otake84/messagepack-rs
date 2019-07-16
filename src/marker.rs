@@ -17,4 +17,5 @@ pub enum Marker {
     Ext8,
     Ext16,
     Ext32,
+    Float32,
 }
