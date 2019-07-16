@@ -19,6 +19,7 @@ impl From<u8> for Marker {
             0xc9 => Marker::Ext32,
             0xca => Marker::Float32,
             0xcb => Marker::Float64,
+            0xcc => Marker::UInt8,
             _ => unimplemented!(),
         }
     }

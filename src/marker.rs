@@ -19,4 +19,5 @@ pub enum Marker {
     Ext32,
     Float32,
     Float64,
+    UInt8,
 }
