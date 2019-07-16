@@ -10,6 +10,7 @@ impl From<u8> for Marker {
             0xc0 => Marker::Nil,
             0xc1 => Marker::Reserved,
             0xc2 => Marker::False,
+            0xc3 => Marker::True,
             _ => unimplemented!(),
         }
     }

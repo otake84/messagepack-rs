@@ -10,4 +10,5 @@ pub enum Marker {
     Nil,
     Reserved,
     False,
+    True,
 }

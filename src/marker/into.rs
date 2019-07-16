@@ -10,6 +10,7 @@ impl Into<u8> for Marker {
             Marker::Nil => 0xc0,
             Marker::Reserved => 0xc1,
             Marker::False => 0xc2,
+            Marker::True => 0xc3,
         }
     }
 }
