@@ -11,6 +11,7 @@ impl Into<u8> for Marker {
             Marker::Reserved => 0xc1,
             Marker::False => 0xc2,
             Marker::True => 0xc3,
+            Marker::Bin8 => 0xc4,
         }
     }
 }

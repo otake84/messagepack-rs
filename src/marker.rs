@@ -11,4 +11,5 @@ pub enum Marker {
     Reserved,
     False,
     True,
+    Bin8,
 }
