@@ -6,6 +6,7 @@ impl Into<u8> for Marker {
             Marker::PositiveFixInt(n) => n,
             Marker::FixMap(n) => 0x80 | (n & 0x0f),
             Marker::FixArray(n) => 0x90 | (n & 0x0f),
+            Marker::FixStr(n) => 0xa0 | (n & 0x1f),
         }
     }
 }
