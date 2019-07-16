@@ -13,4 +13,5 @@ pub enum Marker {
     True,
     Bin8,
     Bin16,
+    Bin32,
 }

@@ -13,6 +13,7 @@ impl Into<u8> for Marker {
             Marker::True => 0xc3,
             Marker::Bin8 => 0xc4,
             Marker::Bin16 => 0xc5,
+            Marker::Bin32 => 0xc6,
         }
     }
 }
