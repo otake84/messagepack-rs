@@ -7,4 +7,5 @@ pub enum Marker {
     FixMap(u8),
     FixArray(u8),
     FixStr(u8),
+    Nil,
 }
