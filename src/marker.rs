@@ -15,4 +15,5 @@ pub enum Marker {
     Bin16,
     Bin32,
     Ext8,
+    Ext16,
 }

@@ -15,6 +15,7 @@ impl From<u8> for Marker {
             0xc5 => Marker::Bin16,
             0xc6 => Marker::Bin32,
             0xc7 => Marker::Ext8,
+            0xc8 => Marker::Ext16,
             _ => unimplemented!(),
         }
     }
