@@ -4,4 +4,5 @@ mod into;
 #[derive(Clone, Debug, PartialEq)]
 pub enum Marker {
     PositiveFixInt(u8),
+    FixMap(u8),
 }
