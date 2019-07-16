@@ -29,6 +29,7 @@ impl Into<u8> for Marker {
             Marker::Int64 => 0xd3,
             Marker::FixExt1 => 0xd4,
             Marker::FixExt2 => 0xd5,
+            Marker::FixExt4 => 0xd6,
         }
     }
 }

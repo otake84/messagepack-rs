@@ -29,4 +29,5 @@ pub enum Marker {
     Int64,
     FixExt1,
     FixExt2,
+    FixExt4,
 }
