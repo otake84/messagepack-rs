@@ -8,4 +8,5 @@ pub enum Marker {
     FixArray(u8),
     FixStr(u8),
     Nil,
+    Reserved,
 }

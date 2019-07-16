@@ -8,6 +8,7 @@ impl From<u8> for Marker {
             0x90...0x9f => Marker::FixArray(n & 0x0f),
             0xa0...0xbf => Marker::FixStr(n & 0x1f),
             0xc0 => Marker::Nil,
+            0xc1 => Marker::Reserved,
             _ => unimplemented!(),
         }
     }
