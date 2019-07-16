@@ -27,4 +27,5 @@ pub enum Marker {
     Int16,
     Int32,
     Int64,
+    FixExt1,
 }
