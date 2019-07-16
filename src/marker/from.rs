@@ -31,6 +31,7 @@ impl From<u8> for Marker {
             0xd5 => Marker::FixExt2,
             0xd6 => Marker::FixExt4,
             0xd7 => Marker::FixExt8,
+            0xd8 => Marker::FixExt16,
             _ => unimplemented!(),
         }
     }
