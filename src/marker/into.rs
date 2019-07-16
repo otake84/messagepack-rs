@@ -21,6 +21,7 @@ impl Into<u8> for Marker {
             Marker::Float64 => 0xcb,
             Marker::UInt8 => 0xcc,
             Marker::UInt16 => 0xcd,
+            Marker::UInt32 => 0xce,
         }
     }
 }

@@ -21,6 +21,7 @@ impl From<u8> for Marker {
             0xcb => Marker::Float64,
             0xcc => Marker::UInt8,
             0xcd => Marker::UInt16,
+            0xce => Marker::UInt32,
             _ => unimplemented!(),
         }
     }
