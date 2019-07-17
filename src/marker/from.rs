@@ -39,7 +39,7 @@ impl From<u8> for Marker {
             0xdd => Marker::Array32,
             0xde => Marker::Map16,
             0xdf => Marker::Map32,
-            _ => unimplemented!(),
+            0xe0...0xff => Marker::NegativeFixInt(n as i8),
         }
     }
 }

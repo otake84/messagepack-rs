@@ -39,4 +39,5 @@ pub enum Marker {
     Array32,
     Map16,
     Map32,
+    NegativeFixInt(i8),
 }

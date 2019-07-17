@@ -39,6 +39,7 @@ impl Into<u8> for Marker {
             Marker::Array32 => 0xdd,
             Marker::Map16 => 0xde,
             Marker::Map32 => 0xdf,
+            Marker::NegativeFixInt(n) => n as u8,
         }
     }
 }
