@@ -35,4 +35,5 @@ pub enum Marker {
     Str8,
     Str16,
     Str32,
+    Array16,
 }

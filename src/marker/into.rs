@@ -35,6 +35,7 @@ impl Into<u8> for Marker {
             Marker::Str8 => 0xd9,
             Marker::Str16 => 0xda,
             Marker::Str32 => 0xdb,
+            Marker::Array16 => 0xdc,
         }
     }
 }
