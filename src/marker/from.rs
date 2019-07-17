@@ -34,6 +34,7 @@ impl From<u8> for Marker {
             0xd8 => Marker::FixExt16,
             0xd9 => Marker::Str8,
             0xda => Marker::Str16,
+            0xdb => Marker::Str32,
             _ => unimplemented!(),
         }
     }
