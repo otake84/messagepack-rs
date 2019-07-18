@@ -4,6 +4,7 @@ use std::convert::{From, Into};
 pub enum Value {
     Nil,
     Bool(bool),
+    Float32(f32),
 }
 
 impl<T: Into<Value>> From<Option<T>> for Value {
@@ -19,5 +20,11 @@ impl<T: Into<Value>> From<Option<T>> for Value {
 impl From<bool> for Value {
     fn from(value: bool) -> Self {
         Value::Bool(value)
+    }
+}
+
+impl From<f32> for Value {
+    fn from(value: f32) -> Self {
+        Value::Float32(value)
     }
 }
