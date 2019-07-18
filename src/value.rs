@@ -20,11 +20,7 @@ pub enum Value {
 
 impl<T: Into<Value>> From<Option<T>> for Value {
     fn from(value: Option<T>) -> Self {
-        if let Some(value) = value {
-            value.into()
-        } else {
-            Value::Nil
-        }
+        value.map_or(Value::Nil, Into::into)
     }
 }
 
