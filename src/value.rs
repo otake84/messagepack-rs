@@ -118,6 +118,12 @@ impl From<Vec<Self>> for Value {
     }
 }
 
+impl From<&[Self]> for Value {
+    fn from(value: &[Self]) -> Self {
+        Value::Array(Vec::from(value))
+    }
+}
+
 impl From<BTreeMap<String, Self>> for Value {
     fn from(value: BTreeMap<String, Self>) -> Self {
         Value::Map(value)
