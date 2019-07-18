@@ -1,3 +1,4 @@
+use crate::binary::Binary;
 use std::collections::BTreeMap;
 use std::convert::{From, Into};
 
@@ -15,6 +16,7 @@ pub enum Value {
     Int16(i16),
     Int32(i32),
     Int64(i64),
+    Binary(Binary),
     String(String),
     Array(Vec<Self>),
     Map(BTreeMap<String, Self>),
@@ -95,6 +97,12 @@ impl From<i64> for Value {
 impl From<String> for Value {
     fn from(value: String) -> Self {
         Value::String(value)
+    }
+}
+
+impl From<Binary> for Value {
+    fn from(value: Binary) -> Self {
+        Value::Binary(value)
     }
 }
 

@@ -1,3 +1,4 @@
+pub mod binary;
 pub mod marker;
 pub mod value;
 
