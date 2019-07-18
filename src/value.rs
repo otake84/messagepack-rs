@@ -5,6 +5,7 @@ pub enum Value {
     Nil,
     Bool(bool),
     Float32(f32),
+    Float64(f64),
 }
 
 impl<T: Into<Value>> From<Option<T>> for Value {
@@ -26,5 +27,11 @@ impl From<bool> for Value {
 impl From<f32> for Value {
     fn from(value: f32) -> Self {
         Value::Float32(value)
+    }
+}
+
+impl From<f64> for Value {
+    fn from(value: f64) -> Self {
+        Value::Float64(value)
     }
 }
