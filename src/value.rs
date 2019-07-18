@@ -1,3 +1,4 @@
+use std::collections::BTreeMap;
 use std::convert::{From, Into};
 
 #[derive(Clone, Debug, PartialEq)]
@@ -16,6 +17,7 @@ pub enum Value {
     Int64(i64),
     String(String),
     Array(Vec<Self>),
+    Map(BTreeMap<String, Self>),
 }
 
 impl<T: Into<Value>> From<Option<T>> for Value {
@@ -105,5 +107,11 @@ impl From<&str> for Value {
 impl From<Vec<Self>> for Value {
     fn from(value: Vec<Self>) -> Self {
         Value::Array(value)
+    }
+}
+
+impl From<BTreeMap<String, Self>> for Value {
+    fn from(value: BTreeMap<String, Self>) -> Self {
+        Value::Map(value)
     }
 }
