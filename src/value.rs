@@ -15,6 +15,7 @@ pub enum Value {
     Int32(i32),
     Int64(i64),
     String(String),
+    Array(Vec<Self>),
 }
 
 impl<T: Into<Value>> From<Option<T>> for Value {
@@ -102,5 +103,11 @@ impl From<String> for Value {
 impl From<&str> for Value {
     fn from(value: &str) -> Self {
         Value::String(String::from(value))
+    }
+}
+
+impl From<Vec<Self>> for Value {
+    fn from(value: Vec<Self>) -> Self {
+        Value::Array(value)
     }
 }
