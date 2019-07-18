@@ -11,6 +11,7 @@ pub enum Value {
     UInt32(u32),
     UInt64(u64),
     Int8(i8),
+    Int16(i16),
 }
 
 impl<T: Into<Value>> From<Option<T>> for Value {
@@ -68,5 +69,11 @@ impl From<u64> for Value {
 impl From<i8> for Value {
     fn from(value: i8) -> Self {
         Value::Int8(value)
+    }
+}
+
+impl From<i16> for Value {
+    fn from(value: i16) -> Self {
+        Value::Int16(value)
     }
 }
