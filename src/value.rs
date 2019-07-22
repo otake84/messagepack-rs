@@ -77,6 +77,28 @@ impl Value {
                     Ok(w)
                 }
             },
+            Value::UInt32(v) => {
+                if v < 0b10000000 {
+                    let mut w = Vec::with_capacity(1);
+                    w.write_u8(v as u8).or(Err(SerializeError::FailedToWrite))?;
+                    Ok(w)
+                } else if v <= u8::max_value() as u32 {
+                    let mut w = Vec::with_capacity(1 + 1);
+                    w.write_u8(Marker::UInt8.into()).or(Err(SerializeError::FailedToWrite))?;
+                    w.write_u8(v as u8).or(Err(SerializeError::FailedToWrite))?;
+                    Ok(w)
+                } else if v <= u16::max_value() as u32 {
+                    let mut w = Vec::with_capacity(1 + 2);
+                    w.write_u8(Marker::UInt16.into()).or(Err(SerializeError::FailedToWrite))?;
+                    w.write_u16::<BigEndian>(v as u16).or(Err(SerializeError::FailedToWrite))?;
+                    Ok(w)
+                } else {
+                    let mut w = Vec::with_capacity(1 + 4);
+                    w.write_u8(Marker::UInt32.into()).or(Err(SerializeError::FailedToWrite))?;
+                    w.write_u32::<BigEndian>(v).or(Err(SerializeError::FailedToWrite))?;
+                    Ok(w)
+                }
+            },
             _ => unimplemented!(),
         }
     }
