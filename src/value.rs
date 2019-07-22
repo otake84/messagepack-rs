@@ -42,6 +42,12 @@ impl Value {
                 w.write_f32::<BigEndian>(*v).or(Err(SerializeError::FailedToWrite))?;
                 Ok(w)
             },
+            Value::Float64(v) => {
+                let mut w = Vec::with_capacity(1 + 8);
+                w.write_u8(Marker::Float64.into()).or(Err(SerializeError::FailedToWrite))?;
+                w.write_f64::<BigEndian>(*v).or(Err(SerializeError::FailedToWrite))?;
+                Ok(w)
+            },
             _ => unimplemented!(),
         }
     }
