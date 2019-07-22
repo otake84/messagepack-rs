@@ -1,5 +1,6 @@
 use crate::binary::Binary;
 use crate::marker::Marker;
+use byteorder::{BigEndian, WriteBytesExt};
 use chrono::prelude::*;
 use std::collections::BTreeMap;
 use std::convert::{From, Into};
@@ -35,6 +36,12 @@ impl Value {
         match self {
             Value::Nil => Ok(vec![Marker::Nil.into()]),
             Value::Bool(v) => Ok(if *v { vec![Marker::True.into()] } else { vec![Marker::False.into()] }),
+            Value::Float32(v) => {
+                let mut w = Vec::with_capacity(1 + 4);
+                w.write_u8(Marker::Float32.into()).or(Err(SerializeError::FailedToWrite))?;
+                w.write_f32::<BigEndian>(*v).or(Err(SerializeError::FailedToWrite))?;
+                Ok(w)
+            },
             _ => unimplemented!(),
         }
     }
