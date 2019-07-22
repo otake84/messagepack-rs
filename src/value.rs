@@ -34,6 +34,7 @@ impl Value {
     pub fn serialize(&self) -> Result<Vec<u8>, SerializeError> {
         match self {
             Value::Nil => Ok(vec![Marker::Nil.into()]),
+            Value::Bool(v) => Ok(if *v { vec![Marker::True.into()] } else { vec![Marker::False.into()] }),
             _ => unimplemented!(),
         }
     }
