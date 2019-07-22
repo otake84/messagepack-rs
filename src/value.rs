@@ -1,4 +1,5 @@
 use crate::binary::Binary;
+use chrono::prelude::*;
 use std::collections::BTreeMap;
 use std::convert::{From, Into};
 
@@ -20,6 +21,7 @@ pub enum Value {
     String(String),
     Array(Vec<Self>),
     Map(BTreeMap<String, Self>),
+    Timestamp(DateTime<Utc>),
 }
 
 impl<T: Into<Value>> From<Option<T>> for Value {
@@ -127,5 +129,11 @@ impl From<&[Self]> for Value {
 impl From<BTreeMap<String, Self>> for Value {
     fn from(value: BTreeMap<String, Self>) -> Self {
         Value::Map(value)
+    }
+}
+
+impl From<DateTime<Utc>> for Value {
+    fn from(value: DateTime<Utc>) -> Self {
+        Value::Timestamp(value)
     }
 }
