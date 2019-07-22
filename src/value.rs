@@ -1,4 +1,5 @@
 use crate::binary::Binary;
+use crate::marker::Marker;
 use chrono::prelude::*;
 use std::collections::BTreeMap;
 use std::convert::{From, Into};
@@ -22,6 +23,20 @@ pub enum Value {
     Array(Vec<Self>),
     Map(BTreeMap<String, Self>),
     Timestamp(DateTime<Utc>),
+}
+
+#[derive(Debug)]
+pub enum SerializeError {
+    FailedToWrite,
+}
+
+impl Value {
+    pub fn serialize(&self) -> Result<Vec<u8>, SerializeError> {
+        match self {
+            Value::Nil => Ok(vec![Marker::Nil.into()]),
+            _ => unimplemented!(),
+        }
+    }
 }
 
 impl<T: Into<Value>> From<Option<T>> for Value {
