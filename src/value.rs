@@ -126,6 +126,18 @@ impl Value {
                     Ok(w)
                 }
             },
+            Value::Int8(v) => {
+                if v >= -0b1111 && v <= 0 {
+                    let mut w = Vec::with_capacity(1);
+                    w.write_i8(v).or(Err(SerializeError::FailedToWrite))?;
+                    Ok(w)
+                } else {
+                    let mut w = Vec::with_capacity(1 + 1);
+                    w.write_u8(Marker::Int8.into()).or(Err(SerializeError::FailedToWrite))?;
+                    w.write_i8(v).or(Err(SerializeError::FailedToWrite))?;
+                    Ok(w)
+                }
+            },
             _ => unimplemented!(),
         }
     }
