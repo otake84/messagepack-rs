@@ -231,6 +231,36 @@ impl Value {
                 w.write_all(&v.0).or(Err(SerializeError::FailedToWrite))?;
                 Ok(w)
             },
+            Value::String(v) => {
+                let mut w = match v.len() {
+                    len if len <= 31 => {
+                        let mut w = Vec::with_capacity(1 + len);
+                        w.write_u8(0b10100000 | len as u8).or(Err(SerializeError::FailedToWrite))?;
+                        w
+                    },
+                    len if u8::max_value() as usize >= len => {
+                        let mut w = Vec::with_capacity(1 + 1 + len);
+                        w.write_u8(Marker::Str8.into()).or(Err(SerializeError::FailedToWrite))?;
+                        w.write_u8(len as u8).or(Err(SerializeError::FailedToWrite))?;
+                        w
+                    },
+                    len if u16::max_value() as usize >= len => {
+                        let mut w = Vec::with_capacity(1 + 2 + len);
+                        w.write_u8(Marker::Str16.into()).or(Err(SerializeError::FailedToWrite))?;
+                        w.write_u16::<BigEndian>(len as u16).or(Err(SerializeError::FailedToWrite))?;
+                        w
+                    },
+                    len if u32::max_value() as usize >= len => {
+                        let mut w = Vec::with_capacity(1 + 4 + len);
+                        w.write_u8(Marker::Str32.into()).or(Err(SerializeError::FailedToWrite))?;
+                        w.write_u32::<BigEndian>(len as u32).or(Err(SerializeError::FailedToWrite))?;
+                        w
+                    },
+                    _ => Err(SerializeError::OutOfRange)?,
+                };
+                w.write_all(v.as_bytes()).or(Err(SerializeError::FailedToWrite))?;
+                Ok(w)
+            },
             _ => unimplemented!(),
         }
     }
