@@ -261,6 +261,34 @@ impl Value {
                 w.write_all(v.as_bytes()).or(Err(SerializeError::FailedToWrite))?;
                 Ok(w)
             },
+            Value::Array(v) => {
+                let mut values = Vec::new();
+                for vv in v.iter() {
+                    values.append(&mut Value::serialize(vv)?);
+                }
+                let mut w = match v.len() {
+                    len if len <= 15 => {
+                        let mut w = Vec::with_capacity(1 + values.len());
+                        w.write_u8(Marker::FixArray(len as u8).into()).or(Err(SerializeError::FailedToWrite))?;
+                        w
+                    },
+                    len if u16::max_value() as usize >= len => {
+                        let mut w = Vec::with_capacity(1 + 2 + values.len());
+                        w.write_u8(Marker::Array16.into()).or(Err(SerializeError::FailedToWrite))?;
+                        w.write_u16::<BigEndian>(len as u16).or(Err(SerializeError::FailedToWrite))?;
+                        w
+                    },
+                    len if u32::max_value() as usize >= len => {
+                        let mut w = Vec::with_capacity(1 + 4 + values.len());
+                        w.write_u8(Marker::Array32.into()).or(Err(SerializeError::FailedToWrite))?;
+                        w.write_u32::<BigEndian>(len as u32).or(Err(SerializeError::FailedToWrite))?;
+                        w
+                    },
+                    _ => Err(SerializeError::OutOfRange)?,
+                };
+                w.append(&mut values);
+                Ok(w)
+            },
             _ => unimplemented!(),
         }
     }
