@@ -289,6 +289,29 @@ impl Value {
                 w.append(&mut values);
                 Ok(w)
             },
+            Value::Map(v) => {
+                let mut w = match v.len() {
+                    len if len <= 15 => {
+                        vec![Marker::FixMap(len as u8).into()]
+                    },
+                    len if u16::max_value() as usize >= len => {
+                        let mut w = vec![Marker::Map16.into()];
+                        w.write_u16::<BigEndian>(len as u16).or(Err(SerializeError::FailedToWrite))?;
+                        w
+                    },
+                    len if u32::max_value() as usize >= len => {
+                        let mut w = vec![Marker::Map32.into()];
+                        w.write_u32::<BigEndian>(len as u32).or(Err(SerializeError::FailedToWrite))?;
+                        w
+                    },
+                    _ => Err(SerializeError::OutOfRange)?,
+                };
+                for (k, v) in v {
+                    w.write_all(&Value::String(k.to_string()).serialize()?).or(Err(SerializeError::FailedToWrite))?;
+                    w.write_all(&v.serialize()?).or(Err(SerializeError::FailedToWrite))?;
+                }
+                Ok(w)
+            },
             _ => unimplemented!(),
         }
     }
