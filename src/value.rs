@@ -312,7 +312,32 @@ impl Value {
                 }
                 Ok(w)
             },
-            _ => unimplemented!(),
+            Value::Timestamp(v) => {
+                if v.timestamp() >> 34 == 0 {
+                    let value = ((v.timestamp_subsec_nanos() as u64) << 34) | (v.timestamp() as u64);
+                    if value & 0xffffffff00000000 == 0 {
+                        let mut w = Vec::with_capacity(1 + 1 + 4);
+                        w.write_u8(Marker::FixExt4.into()).or(Err(SerializeError::FailedToWrite))?;
+                        w.write_i8(-1).or(Err(SerializeError::FailedToWrite))?;
+                        w.write_u32::<BigEndian>(value as u32).or(Err(SerializeError::FailedToWrite))?;
+                        Ok(w)
+                    } else {
+                        let mut w = Vec::with_capacity(1 + 1 + 8);
+                        w.write_u8(Marker::FixExt8.into()).or(Err(SerializeError::FailedToWrite))?;
+                        w.write_i8(-1).or(Err(SerializeError::FailedToWrite))?;
+                        w.write_u64::<BigEndian>(value).or(Err(SerializeError::FailedToWrite))?;
+                        Ok(w)
+                    }
+                } else {
+                    let mut w = Vec::with_capacity(1 + 1 + 1 + 4 + 8);
+                    w.write_u8(Marker::Ext8.into()).or(Err(SerializeError::FailedToWrite))?;
+                    w.write_u8(12).or(Err(SerializeError::FailedToWrite))?;
+                    w.write_i8(-1).or(Err(SerializeError::FailedToWrite))?;
+                    w.write_u32::<BigEndian>(v.timestamp_subsec_nanos() as u32).or(Err(SerializeError::FailedToWrite))?;
+                    w.write_i64::<BigEndian>(v.timestamp()).or(Err(SerializeError::FailedToWrite))?;
+                    Ok(w)
+                }
+            },
         }
     }
 }
