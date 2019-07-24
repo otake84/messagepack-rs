@@ -235,7 +235,7 @@ impl Value {
                 let mut w = match v.len() {
                     len if len <= 31 => {
                         let mut w = Vec::with_capacity(1 + len);
-                        w.write_u8(0b10100000 | len as u8).or(Err(SerializeError::FailedToWrite))?;
+                        w.write_u8(Marker::FixStr(len as u8).into()).or(Err(SerializeError::FailedToWrite))?;
                         w
                     },
                     len if u8::max_value() as usize >= len => {
