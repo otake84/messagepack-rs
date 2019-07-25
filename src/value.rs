@@ -401,6 +401,7 @@ impl Value {
 
     pub fn deserialize<R: Read>(buf_reader: &mut BufReader<R>) -> Result<Self, DeserializeError> {
         match Marker::from(buf_reader.read_u8().or(Err(DeserializeError::InvalidMarker))?) {
+            Marker::PositiveFixInt(n) => Ok(Value::UInt8(n)),
             Marker::Nil => Ok(Value::Nil),
             Marker::True => Ok(Value::Bool(true)),
             Marker::False => Ok(Value::Bool(false)),
