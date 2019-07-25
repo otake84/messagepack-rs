@@ -24,6 +24,7 @@ pub enum Value {
     String(String),
     Array(Vec<Self>),
     Map(BTreeMap<String, Self>),
+    Extension(i8, Vec<u8>),
     Timestamp(DateTime<Utc>),
 }
 
@@ -310,6 +311,57 @@ impl Value {
                     w.write_all(&Value::String(k.to_string()).serialize()?).or(Err(SerializeError::FailedToWrite))?;
                     w.write_all(&v.serialize()?).or(Err(SerializeError::FailedToWrite))?;
                 }
+                Ok(w)
+            },
+            Value::Extension(t, v) => {
+                let mut w = match v.len() {
+                    1 => {
+                        let mut w = Vec::with_capacity(1 + 1 + 1);
+                        w.write_u8(Marker::FixExt1.into()).or(Err(SerializeError::FailedToWrite))?;
+                        w
+                    },
+                    2 => {
+                        let mut w = Vec::with_capacity(1 + 1 + 2);
+                        w.write_u8(Marker::FixExt2.into()).or(Err(SerializeError::FailedToWrite))?;
+                        w
+                    },
+                    4 => {
+                        let mut w = Vec::with_capacity(1 + 1 + 4);
+                        w.write_u8(Marker::FixExt4.into()).or(Err(SerializeError::FailedToWrite))?;
+                        w
+                    },
+                    8 => {
+                        let mut w = Vec::with_capacity(1 + 1 + 8);
+                        w.write_u8(Marker::FixExt8.into()).or(Err(SerializeError::FailedToWrite))?;
+                        w
+                    },
+                    16 => {
+                        let mut w = Vec::with_capacity(1 + 1 + 16);
+                        w.write_u8(Marker::FixExt16.into()).or(Err(SerializeError::FailedToWrite))?;
+                        w
+                    },
+                    len if len <= u8::max_value() as usize => {
+                        let mut w = Vec::with_capacity(1 + 1 + 1 + len);
+                        w.write_u8(Marker::Ext8.into()).or(Err(SerializeError::FailedToWrite))?;
+                        w.write_u8(len as u8).or(Err(SerializeError::FailedToWrite))?;
+                        w
+                    },
+                    len if len <= u16::max_value() as usize => {
+                        let mut w = Vec::with_capacity(1 + 2 + 1 + len);
+                        w.write_u8(Marker::Ext16.into()).or(Err(SerializeError::FailedToWrite))?;
+                        w.write_u16::<BigEndian>(len as u16).or(Err(SerializeError::FailedToWrite))?;
+                        w
+                    },
+                    len if len <= u32::max_value() as usize => {
+                        let mut w = Vec::with_capacity(1 + 4 + 1 + len);
+                        w.write_u8(Marker::Ext32.into()).or(Err(SerializeError::FailedToWrite))?;
+                        w.write_u32::<BigEndian>(len as u32).or(Err(SerializeError::FailedToWrite))?;
+                        w
+                    },
+                    _ => Err(SerializeError::OutOfRange)?,
+                };
+                w.write_i8(*t).or(Err(SerializeError::FailedToWrite))?;
+                w.append(&mut v.clone());
                 Ok(w)
             },
             Value::Timestamp(v) => {
