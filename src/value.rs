@@ -1,10 +1,10 @@
 use crate::binary::Binary;
 use crate::marker::Marker;
-use byteorder::{BigEndian, WriteBytesExt};
+use byteorder::{BigEndian, ReadBytesExt, WriteBytesExt};
 use chrono::prelude::*;
 use std::collections::BTreeMap;
 use std::convert::{From, Into};
-use std::io::Write;
+use std::io::{BufReader, Read, Write};
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Value {
@@ -32,6 +32,11 @@ pub enum Value {
 pub enum SerializeError {
     FailedToWrite,
     OutOfRange,
+}
+
+#[derive(Debug)]
+pub enum DeserializeError {
+    InvalidMarker,
 }
 
 impl Value {
@@ -391,6 +396,13 @@ impl Value {
                     Ok(w)
                 }
             },
+        }
+    }
+
+    pub fn deserialize<R: Read>(buf_reader: &mut BufReader<R>) -> Result<Self, DeserializeError> {
+        match Marker::from(buf_reader.read_u8().or(Err(DeserializeError::InvalidMarker))?) {
+            Marker::Nil => Ok(Value::Nil),
+            _ => unimplemented!(),
         }
     }
 }
