@@ -407,6 +407,7 @@ impl Value {
             Marker::True => Ok(Value::Bool(true)),
             Marker::False => Ok(Value::Bool(false)),
             Marker::Float32 => Ok(Value::Float32(buf_reader.read_f32::<BigEndian>().or(Err(DeserializeError::InvalidValue))?)),
+            Marker::Float64 => Ok(Value::Float64(buf_reader.read_f64::<BigEndian>().or(Err(DeserializeError::InvalidValue))?)),
             Marker::UInt8 => Ok(Value::UInt8(buf_reader.read_u8().or(Err(DeserializeError::InvalidValue))?)),
             Marker::UInt16 => Ok(Value::UInt16(buf_reader.read_u16::<BigEndian>().or(Err(DeserializeError::InvalidValue))?)),
             Marker::UInt32 => Ok(Value::UInt32(buf_reader.read_u32::<BigEndian>().or(Err(DeserializeError::InvalidValue))?)),
