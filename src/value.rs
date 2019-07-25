@@ -36,6 +36,7 @@ pub enum SerializeError {
 
 #[derive(Debug)]
 pub enum DeserializeError {
+    InvalidLength,
     InvalidMarker,
     InvalidValue,
 }
@@ -406,6 +407,7 @@ impl Value {
             Marker::Nil => Ok(Value::Nil),
             Marker::True => Ok(Value::Bool(true)),
             Marker::False => Ok(Value::Bool(false)),
+            Marker::Bin8 => Self::deserialize_binary(buf_reader.read_u8().or(Err(DeserializeError::InvalidLength))? as usize, buf_reader),
             Marker::Float32 => Ok(Value::Float32(buf_reader.read_f32::<BigEndian>().or(Err(DeserializeError::InvalidValue))?)),
             Marker::Float64 => Ok(Value::Float64(buf_reader.read_f64::<BigEndian>().or(Err(DeserializeError::InvalidValue))?)),
             Marker::UInt8 => Ok(Value::UInt8(buf_reader.read_u8().or(Err(DeserializeError::InvalidValue))?)),
@@ -419,6 +421,13 @@ impl Value {
             Marker::NegativeFixInt(n) => Ok(Value::Int8(n)),
             _ => unimplemented!(),
         }
+    }
+
+    fn deserialize_binary<R: Read>(size: usize, buf_reader: &mut BufReader<R>) -> Result<Self, DeserializeError> {
+        let mut buf = Vec::with_capacity(size);
+        unsafe { buf.set_len(size); }
+        buf_reader.read_exact(&mut buf[..]).or(Err(DeserializeError::InvalidValue))?;
+        Ok(Value::Binary(Binary(buf)))
     }
 }
 
