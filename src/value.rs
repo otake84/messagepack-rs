@@ -407,6 +407,7 @@ impl Value {
             Marker::True => Ok(Value::Bool(true)),
             Marker::False => Ok(Value::Bool(false)),
             Marker::UInt8 => Ok(Value::UInt8(buf_reader.read_u8().or(Err(DeserializeError::InvalidValue))?)),
+            Marker::UInt16 => Ok(Value::UInt16(buf_reader.read_u16::<BigEndian>().or(Err(DeserializeError::InvalidValue))?)),
             _ => unimplemented!(),
         }
     }
