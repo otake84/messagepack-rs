@@ -409,6 +409,7 @@ impl Value {
             Marker::UInt8 => Ok(Value::UInt8(buf_reader.read_u8().or(Err(DeserializeError::InvalidValue))?)),
             Marker::UInt16 => Ok(Value::UInt16(buf_reader.read_u16::<BigEndian>().or(Err(DeserializeError::InvalidValue))?)),
             Marker::UInt32 => Ok(Value::UInt32(buf_reader.read_u32::<BigEndian>().or(Err(DeserializeError::InvalidValue))?)),
+            Marker::UInt64 => Ok(Value::UInt64(buf_reader.read_u64::<BigEndian>().or(Err(DeserializeError::InvalidValue))?)),
             _ => unimplemented!(),
         }
     }
