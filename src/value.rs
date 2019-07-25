@@ -414,6 +414,7 @@ impl Value {
             Marker::Int16 => Ok(Value::Int16(buf_reader.read_i16::<BigEndian>().or(Err(DeserializeError::InvalidValue))?)),
             Marker::Int32 => Ok(Value::Int32(buf_reader.read_i32::<BigEndian>().or(Err(DeserializeError::InvalidValue))?)),
             Marker::Int64 => Ok(Value::Int64(buf_reader.read_i64::<BigEndian>().or(Err(DeserializeError::InvalidValue))?)),
+            Marker::NegativeFixInt(n) => Ok(Value::Int8(n)),
             _ => unimplemented!(),
         }
     }
