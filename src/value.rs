@@ -403,6 +403,7 @@ impl Value {
         match Marker::from(buf_reader.read_u8().or(Err(DeserializeError::InvalidMarker))?) {
             Marker::Nil => Ok(Value::Nil),
             Marker::True => Ok(Value::Bool(true)),
+            Marker::False => Ok(Value::Bool(false)),
             _ => unimplemented!(),
         }
     }
