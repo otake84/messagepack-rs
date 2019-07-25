@@ -37,6 +37,7 @@ pub enum SerializeError {
 #[derive(Debug)]
 pub enum DeserializeError {
     InvalidMarker,
+    InvalidValue,
 }
 
 impl Value {
@@ -405,6 +406,7 @@ impl Value {
             Marker::Nil => Ok(Value::Nil),
             Marker::True => Ok(Value::Bool(true)),
             Marker::False => Ok(Value::Bool(false)),
+            Marker::UInt8 => Ok(Value::UInt8(buf_reader.read_u8().or(Err(DeserializeError::InvalidValue))?)),
             _ => unimplemented!(),
         }
     }
