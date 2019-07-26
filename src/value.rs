@@ -59,7 +59,7 @@ impl Value {
                 Ok(w)
             },
             Value::UInt8(v) => {
-                if v < 0b10000000 {
+                if v < 0b1000_0000 {
                     let mut w = Vec::with_capacity(1);
                     w.write_u8(v).or(Err(SerializeError::FailedToWrite))?;
                     Ok(w)
@@ -71,11 +71,11 @@ impl Value {
                 }
             },
             Value::UInt16(v) => {
-                if v < 0b10000000 {
+                if v < 0b1000_0000 {
                     let mut w = Vec::with_capacity(1);
                     w.write_u8(v as u8).or(Err(SerializeError::FailedToWrite))?;
                     Ok(w)
-                } else if v <= u8::max_value() as u16 {
+                } else if v <= u16::from(u8::max_value()) {
                     let mut w = Vec::with_capacity(1 + 1);
                     w.write_u8(Marker::UInt8.into()).or(Err(SerializeError::FailedToWrite))?;
                     w.write_u8(v as u8).or(Err(SerializeError::FailedToWrite))?;
@@ -88,16 +88,16 @@ impl Value {
                 }
             },
             Value::UInt32(v) => {
-                if v < 0b10000000 {
+                if v < 0b1000_0000 {
                     let mut w = Vec::with_capacity(1);
                     w.write_u8(v as u8).or(Err(SerializeError::FailedToWrite))?;
                     Ok(w)
-                } else if v <= u8::max_value() as u32 {
+                } else if v <= u32::from(u8::max_value()) {
                     let mut w = Vec::with_capacity(1 + 1);
                     w.write_u8(Marker::UInt8.into()).or(Err(SerializeError::FailedToWrite))?;
                     w.write_u8(v as u8).or(Err(SerializeError::FailedToWrite))?;
                     Ok(w)
-                } else if v <= u16::max_value() as u32 {
+                } else if v <= u32::from(u16::max_value()) {
                     let mut w = Vec::with_capacity(1 + 2);
                     w.write_u8(Marker::UInt16.into()).or(Err(SerializeError::FailedToWrite))?;
                     w.write_u16::<BigEndian>(v as u16).or(Err(SerializeError::FailedToWrite))?;
@@ -110,21 +110,21 @@ impl Value {
                 }
             },
             Value::UInt64(v) => {
-                if v < 0b10000000 {
+                if v < 0b1000_0000 {
                     let mut w = Vec::with_capacity(1);
                     w.write_u8(v as u8).or(Err(SerializeError::FailedToWrite))?;
                     Ok(w)
-                } else if v <= u8::max_value() as u64 {
+                } else if v <= u64::from(u8::max_value()) {
                     let mut w = Vec::with_capacity(1 + 1);
                     w.write_u8(Marker::UInt8.into()).or(Err(SerializeError::FailedToWrite))?;
                     w.write_u8(v as u8).or(Err(SerializeError::FailedToWrite))?;
                     Ok(w)
-                } else if v <= u16::max_value() as u64 {
+                } else if v <= u64::from(u16::max_value()) {
                     let mut w = Vec::with_capacity(1 + 2);
                     w.write_u8(Marker::UInt16.into()).or(Err(SerializeError::FailedToWrite))?;
                     w.write_u16::<BigEndian>(v as u16).or(Err(SerializeError::FailedToWrite))?;
                     Ok(w)
-                } else if v <= u32::max_value() as u64 {
+                } else if v <= u64::from(u32::max_value()) {
                     let mut w = Vec::with_capacity(1 + 4);
                     w.write_u8(Marker::UInt32.into()).or(Err(SerializeError::FailedToWrite))?;
                     w.write_u32::<BigEndian>(v as u32).or(Err(SerializeError::FailedToWrite))?;
@@ -153,7 +153,7 @@ impl Value {
                     let mut w = Vec::with_capacity(1);
                     w.write_i8(v as i8).or(Err(SerializeError::FailedToWrite))?;
                     Ok(w)
-                } else if v >= i8::min_value() as i16 && v <= i8::max_value() as i16 {
+                } else if v >= i16::from(i8::min_value()) && v <= i16::from(i8::max_value()) {
                     let mut w = Vec::with_capacity(1 + 1);
                     w.write_u8(Marker::Int8.into()).or(Err(SerializeError::FailedToWrite))?;
                     w.write_i8(v as i8).or(Err(SerializeError::FailedToWrite))?;
@@ -170,12 +170,12 @@ impl Value {
                     let mut w = Vec::with_capacity(1);
                     w.write_i8(v as i8).or(Err(SerializeError::FailedToWrite))?;
                     Ok(w)
-                } else if v >= i8::min_value() as i32 && v <= i8::max_value() as i32 {
+                } else if v >= i32::from(i8::min_value()) && v <= i32::from(i8::max_value()) {
                     let mut w = Vec::with_capacity(1 + 1);
                     w.write_u8(Marker::Int8.into()).or(Err(SerializeError::FailedToWrite))?;
                     w.write_i8(v as i8).or(Err(SerializeError::FailedToWrite))?;
                     Ok(w)
-                } else if v >= i16::min_value() as i32 && v <= i16::max_value() as i32 {
+                } else if v >= i32::from(i16::min_value()) && v <= i32::from(i16::max_value()) {
                     let mut w = Vec::with_capacity(1 + 2);
                     w.write_u8(Marker::Int16.into()).or(Err(SerializeError::FailedToWrite))?;
                     w.write_i16::<BigEndian>(v as i16).or(Err(SerializeError::FailedToWrite))?;
@@ -192,17 +192,17 @@ impl Value {
                     let mut w = Vec::with_capacity(1);
                     w.write_i8(v as i8).or(Err(SerializeError::FailedToWrite))?;
                     Ok(w)
-                } else if v >= i8::min_value() as i64 && v <= i8::max_value() as i64 {
+                } else if v >= i64::from(i8::min_value()) && v <= i64::from(i8::max_value()) {
                     let mut w = Vec::with_capacity(1 + 1);
                     w.write_u8(Marker::Int8.into()).or(Err(SerializeError::FailedToWrite))?;
                     w.write_i8(v as i8).or(Err(SerializeError::FailedToWrite))?;
                     Ok(w)
-                } else if v >= i16::min_value() as i64 && v <= i16::max_value() as i64 {
+                } else if v >= i64::from(i16::min_value()) && v <= i64::from(i16::max_value()) {
                     let mut w = Vec::with_capacity(1 + 2);
                     w.write_u8(Marker::Int16.into()).or(Err(SerializeError::FailedToWrite))?;
                     w.write_i16::<BigEndian>(v as i16).or(Err(SerializeError::FailedToWrite))?;
                     Ok(w)
-                } else if v >= i32::min_value() as i64 && v <= i32::max_value() as i64 {
+                } else if v >= i64::from(i32::min_value()) && v <= i64::from(i32::max_value()) {
                     let mut w = Vec::with_capacity(1 + 4);
                     w.write_u8(Marker::Int32.into()).or(Err(SerializeError::FailedToWrite))?;
                     w.write_i32::<BigEndian>(v as i32).or(Err(SerializeError::FailedToWrite))?;
@@ -374,8 +374,8 @@ impl Value {
             },
             Value::Timestamp(v) => {
                 if v.timestamp() >> 34 == 0 {
-                    let value = ((v.timestamp_subsec_nanos() as u64) << 34) | (v.timestamp() as u64);
-                    if value & 0xffffffff00000000 == 0 {
+                    let value = (u64::from(v.timestamp_subsec_nanos()) << 34) | (v.timestamp() as u64);
+                    if value & 0xffff_ffff_0000_0000 == 0 {
                         let mut w = Vec::with_capacity(1 + 1 + 4);
                         w.write_u8(Marker::FixExt4.into()).or(Err(SerializeError::FailedToWrite))?;
                         w.write_i8(-1).or(Err(SerializeError::FailedToWrite))?;
