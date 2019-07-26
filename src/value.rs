@@ -404,6 +404,7 @@ impl Value {
     pub fn deserialize<R: Read>(buf_reader: &mut BufReader<R>) -> Result<Self, DeserializeError> {
         match Marker::from(buf_reader.read_u8().or(Err(DeserializeError::InvalidMarker))?) {
             Marker::PositiveFixInt(n) => Ok(Value::UInt8(n)),
+            Marker::FixArray(n) => Self::deserialize_array(n as usize, buf_reader),
             Marker::FixStr(n) => Self::deserialize_string(n as usize, buf_reader),
             Marker::Nil => Ok(Value::Nil),
             Marker::True => Ok(Value::Bool(true)),
@@ -441,6 +442,14 @@ impl Value {
         unsafe { buf.set_len(size); }
         buf_reader.read_exact(&mut buf).or(Err(DeserializeError::InvalidValue))?;
         Ok(Value::String(String::from_utf8(buf).or(Err(DeserializeError::InvalidValue))?))
+    }
+
+    fn deserialize_array<R: Read>(size: usize, buf_reader: &mut BufReader<R>) -> Result<Self, DeserializeError> {
+        let mut buf = Vec::with_capacity(size);
+        for _ in 0..size {
+            buf.push(Self::deserialize(buf_reader)?);
+        }
+        Ok(Value::Array(buf))
     }
 }
 
