@@ -408,8 +408,9 @@ impl Value {
             Marker::FixArray(n) => Self::deserialize_array(n as usize, buf_reader),
             Marker::FixStr(n) => Self::deserialize_string(n as usize, buf_reader),
             Marker::Nil => Ok(Value::Nil),
-            Marker::True => Ok(Value::Bool(true)),
+            Marker::Reserved => Err(DeserializeError::InvalidMarker),
             Marker::False => Ok(Value::Bool(false)),
+            Marker::True => Ok(Value::Bool(true)),
             Marker::Bin8 => Self::deserialize_binary(buf_reader.read_u8().or(Err(DeserializeError::InvalidLength))? as usize, buf_reader),
             Marker::Bin16 => Self::deserialize_binary(buf_reader.read_u16::<BigEndian>().or(Err(DeserializeError::InvalidLength))? as usize, buf_reader),
             Marker::Bin32 => Self::deserialize_binary(buf_reader.read_u32::<BigEndian>().or(Err(DeserializeError::InvalidLength))? as usize, buf_reader),
@@ -439,7 +440,6 @@ impl Value {
             Marker::Map16 => Self::deserialize_map(buf_reader.read_u16::<BigEndian>().or(Err(DeserializeError::InvalidLength))? as usize, buf_reader),
             Marker::Map32 => Self::deserialize_map(buf_reader.read_u32::<BigEndian>().or(Err(DeserializeError::InvalidLength))? as usize, buf_reader),
             Marker::NegativeFixInt(n) => Ok(Value::Int8(n)),
-            _ => unimplemented!(),
         }
     }
 
