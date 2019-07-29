@@ -375,7 +375,7 @@ impl Value {
             Value::Timestamp(v) => {
                 if v.timestamp() >> 34 == 0 {
                     let value = (u64::from(v.timestamp_subsec_nanos()) << 34) | (v.timestamp() as u64);
-                    if value & 0xffff_ffff_0000_0000 == 0 {
+                    if value & 0xff_ff_ff_ff_00_00_00_00 == 0 {
                         let mut w = Vec::with_capacity(1 + 1 + 4);
                         w.write_u8(Marker::FixExt4.into()).or(Err(SerializeError::FailedToWrite))?;
                         w.write_i8(-1).or(Err(SerializeError::FailedToWrite))?;
@@ -497,7 +497,7 @@ impl Value {
             } else if size == 8 {
                 let value = buf_reader.read_u64::<BigEndian>().or(Err(DeserializeError::InvalidValue))?;
                 let nano = value >> 34;
-                let sec = value & 0x0000_0003_ffff_ffff;
+                let sec = value & 0x00_00_00_03_ff_ff_ff_ff;
                 Utc.timestamp_opt(sec as i64, nano as u32).single().map(Value::Timestamp).ok_or(DeserializeError::InvalidValue)
             } else if size == 12 {
                 let nano = buf_reader.read_u32::<BigEndian>().or(Err(DeserializeError::InvalidValue))?;
