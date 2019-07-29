@@ -404,6 +404,7 @@ impl Value {
     pub fn deserialize<R: Read>(buf_reader: &mut BufReader<R>) -> Result<Self, DeserializeError> {
         match Marker::from(buf_reader.read_u8().or(Err(DeserializeError::InvalidMarker))?) {
             Marker::PositiveFixInt(n) => Ok(Value::UInt8(n)),
+            Marker::FixMap(n) => Self::deserialize_map(n as usize, buf_reader),
             Marker::FixArray(n) => Self::deserialize_array(n as usize, buf_reader),
             Marker::FixStr(n) => Self::deserialize_string(n as usize, buf_reader),
             Marker::Nil => Ok(Value::Nil),
@@ -461,11 +462,13 @@ impl Value {
 
         fn deserialize_string_primitive<R: Read>(buf_reader: &mut BufReader<R>) -> Result<String, DeserializeError> {
             let mut buf = match From::from(buf_reader.read_u8().or(Err(DeserializeError::InvalidMarker))?) {
+                Marker::FixStr(n) => Vec::with_capacity(n as usize),
                 Marker::Str8 => Vec::with_capacity(buf_reader.read_u8().or(Err(DeserializeError::InvalidLength))? as usize),
                 Marker::Str16 => Vec::with_capacity(buf_reader.read_u16::<BigEndian>().or(Err(DeserializeError::InvalidLength))? as usize),
                 Marker::Str32 => Vec::with_capacity(buf_reader.read_u32::<BigEndian>().or(Err(DeserializeError::InvalidLength))? as usize),
                 _ => Err(DeserializeError::InvalidMarker)?
             };
+            unsafe { buf.set_len(buf.capacity()); }
             buf_reader.read_exact(&mut buf[..]).or(Err(DeserializeError::InvalidValue))?;
             String::from_utf8(buf).or(Err(DeserializeError::InvalidValue))
         }
