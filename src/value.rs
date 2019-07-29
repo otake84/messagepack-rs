@@ -413,6 +413,7 @@ impl Value {
             Marker::Bin8 => Self::deserialize_binary(buf_reader.read_u8().or(Err(DeserializeError::InvalidLength))? as usize, buf_reader),
             Marker::Bin16 => Self::deserialize_binary(buf_reader.read_u16::<BigEndian>().or(Err(DeserializeError::InvalidLength))? as usize, buf_reader),
             Marker::Bin32 => Self::deserialize_binary(buf_reader.read_u32::<BigEndian>().or(Err(DeserializeError::InvalidLength))? as usize, buf_reader),
+            Marker::Ext8 => Self::deserialize_extension(buf_reader.read_u8().or(Err(DeserializeError::InvalidLength))? as usize, buf_reader),
             Marker::Float32 => Ok(Value::Float32(buf_reader.read_f32::<BigEndian>().or(Err(DeserializeError::InvalidValue))?)),
             Marker::Float64 => Ok(Value::Float64(buf_reader.read_f64::<BigEndian>().or(Err(DeserializeError::InvalidValue))?)),
             Marker::UInt8 => Ok(Value::UInt8(buf_reader.read_u8().or(Err(DeserializeError::InvalidValue))?)),
@@ -496,8 +497,12 @@ impl Value {
                 let nano = value >> 34;
                 let sec = value & 0x0000_0003_ffff_ffff;
                 Utc.timestamp_opt(sec as i64, nano as u32).single().map(Value::Timestamp).ok_or(DeserializeError::InvalidValue)
+            } else if size == 12 {
+                let nano = buf_reader.read_u32::<BigEndian>().or(Err(DeserializeError::InvalidValue))?;
+                let sec = buf_reader.read_i64::<BigEndian>().or(Err(DeserializeError::InvalidValue))?;
+                Utc.timestamp_opt(sec, nano).single().map(Value::Timestamp).ok_or(DeserializeError::InvalidValue)
             } else {
-                unimplemented!()
+                Err(DeserializeError::InvalidValue)
             }
         } else {
             let mut buf = Vec::with_capacity(size);
