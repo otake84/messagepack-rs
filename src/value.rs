@@ -423,6 +423,7 @@ impl Value {
             Marker::Int16 => Ok(Value::Int16(buf_reader.read_i16::<BigEndian>().or(Err(DeserializeError::InvalidValue))?)),
             Marker::Int32 => Ok(Value::Int32(buf_reader.read_i32::<BigEndian>().or(Err(DeserializeError::InvalidValue))?)),
             Marker::Int64 => Ok(Value::Int64(buf_reader.read_i64::<BigEndian>().or(Err(DeserializeError::InvalidValue))?)),
+            Marker::FixExt1 => Self::deserialize_extension(1, buf_reader),
             Marker::Str8 => Self::deserialize_string(buf_reader.read_u8().or(Err(DeserializeError::InvalidLength))? as usize, buf_reader),
             Marker::Str16 => Self::deserialize_string(buf_reader.read_u16::<BigEndian>().or(Err(DeserializeError::InvalidLength))? as usize, buf_reader),
             Marker::Str32 => Self::deserialize_string(buf_reader.read_u32::<BigEndian>().or(Err(DeserializeError::InvalidLength))? as usize, buf_reader),
@@ -477,6 +478,19 @@ impl Value {
             buf.insert(deserialize_string_primitive(buf_reader)?, Self::deserialize(buf_reader)?);
         }
         Ok(Value::Map(buf))
+    }
+
+    fn deserialize_extension<R: Read>(size: usize, buf_reader: &mut BufReader<R>) -> Result<Self, DeserializeError> {
+        let t = buf_reader.read_i8().or(Err(DeserializeError::InvalidLength))?;
+        let mut buf = Vec::with_capacity(size);
+        unsafe { buf.set_len(buf.capacity()); }
+        buf_reader.read_exact(&mut buf[..]).or(Err(DeserializeError::InvalidValue))?;
+
+        if t == -1 {
+            unimplemented!()
+        } else {
+            Ok(Value::Extension(t, buf))
+        }
     }
 }
 
