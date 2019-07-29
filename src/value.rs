@@ -427,6 +427,7 @@ impl Value {
             Marker::Str32 => Self::deserialize_string(buf_reader.read_u32::<BigEndian>().or(Err(DeserializeError::InvalidLength))? as usize, buf_reader),
             Marker::Array16 => Self::deserialize_array(buf_reader.read_u16::<BigEndian>().or(Err(DeserializeError::InvalidLength))? as usize, buf_reader),
             Marker::Array32 => Self::deserialize_array(buf_reader.read_u32::<BigEndian>().or(Err(DeserializeError::InvalidLength))? as usize, buf_reader),
+            Marker::Map16 => Self::deserialize_map(buf_reader.read_u16::<BigEndian>().or(Err(DeserializeError::InvalidLength))? as usize, buf_reader),
             Marker::NegativeFixInt(n) => Ok(Value::Int8(n)),
             _ => unimplemented!(),
         }
@@ -452,6 +453,26 @@ impl Value {
             buf.push(Self::deserialize(buf_reader)?);
         }
         Ok(Value::Array(buf))
+    }
+
+    fn deserialize_map<R: Read>(size: usize, buf_reader: &mut BufReader<R>) -> Result<Self, DeserializeError> {
+        let mut buf = BTreeMap::new();
+
+        fn deserialize_string_primitive<R: Read>(buf_reader: &mut BufReader<R>) -> Result<String, DeserializeError> {
+            let mut buf = match From::from(buf_reader.read_u8().or(Err(DeserializeError::InvalidMarker))?) {
+                Marker::Str8 => Vec::with_capacity(buf_reader.read_u8().or(Err(DeserializeError::InvalidLength))? as usize),
+                Marker::Str16 => Vec::with_capacity(buf_reader.read_u16::<BigEndian>().or(Err(DeserializeError::InvalidLength))? as usize),
+                Marker::Str32 => Vec::with_capacity(buf_reader.read_u32::<BigEndian>().or(Err(DeserializeError::InvalidLength))? as usize),
+                _ => Err(DeserializeError::InvalidMarker)?
+            };
+            buf_reader.read_exact(&mut buf[..]).or(Err(DeserializeError::InvalidValue))?;
+            String::from_utf8(buf).or(Err(DeserializeError::InvalidValue))
+        }
+
+        for _ in 0..size {
+            buf.insert(deserialize_string_primitive(buf_reader)?, Self::deserialize(buf_reader)?);
+        }
+        Ok(Value::Map(buf))
     }
 }
 
