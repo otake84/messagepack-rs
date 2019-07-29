@@ -427,6 +427,7 @@ impl Value {
             Marker::FixExt2 => Self::deserialize_extension(2, buf_reader),
             Marker::FixExt4 => Self::deserialize_extension(4, buf_reader),
             Marker::FixExt8 => Self::deserialize_extension(8, buf_reader),
+            Marker::FixExt16 => Self::deserialize_extension(16, buf_reader),
             Marker::Str8 => Self::deserialize_string(buf_reader.read_u8().or(Err(DeserializeError::InvalidLength))? as usize, buf_reader),
             Marker::Str16 => Self::deserialize_string(buf_reader.read_u16::<BigEndian>().or(Err(DeserializeError::InvalidLength))? as usize, buf_reader),
             Marker::Str32 => Self::deserialize_string(buf_reader.read_u32::<BigEndian>().or(Err(DeserializeError::InvalidLength))? as usize, buf_reader),
