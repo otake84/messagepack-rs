@@ -1,4 +1,4 @@
-use crate::value::{SerializeError, Value};
+use crate::serializable::*;
 use std::io::{BufWriter, Error, Write};
 
 pub struct Serializer<T: Write>(BufWriter<T>);
@@ -8,7 +8,7 @@ impl<W: Write> Serializer<W> {
         Serializer(BufWriter::new(w))
     }
 
-    pub fn serialize(&mut self, value: Value) -> Result<usize, SerializeError> {
+    pub fn serialize<T: Serializable>(&mut self, value: T) -> Result<usize, SerializeError> {
         self.0.write(&value.serialize()?).or(Err(SerializeError::FailedToWrite))
     }
 
@@ -20,3 +20,4 @@ impl<W: Write> Serializer<W> {
         self.0.flush()
     }
 }
+

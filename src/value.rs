@@ -2,6 +2,7 @@ pub mod stream;
 
 use crate::binary::Binary;
 use crate::marker::Marker;
+use crate::serializable::{Serializable, SerializeError};
 use byteorder::{BigEndian, ReadBytesExt, WriteBytesExt};
 use chrono::prelude::*;
 use std::collections::BTreeMap;
@@ -31,20 +32,14 @@ pub enum Value {
 }
 
 #[derive(Debug)]
-pub enum SerializeError {
-    FailedToWrite,
-    OutOfRange,
-}
-
-#[derive(Debug)]
 pub enum DeserializeError {
     InvalidLength,
     InvalidMarker,
     InvalidValue,
 }
 
-impl Value {
-    pub fn serialize(self) -> Result<Vec<u8>, SerializeError> {
+impl Serializable for Value {
+    fn serialize(self) -> Result<Vec<u8>, SerializeError> {
         match self {
             Value::Nil => Ok(vec![Marker::Nil.into()]),
             Value::Bool(v) => Ok(if v { vec![Marker::True.into()] } else { vec![Marker::False.into()] }),
@@ -402,7 +397,9 @@ impl Value {
             },
         }
     }
+}
 
+impl Value {
     pub fn deserialize<R: Read>(buf_reader: &mut BufReader<R>) -> Result<Self, DeserializeError> {
         match Marker::from(buf_reader.read_u8().or(Err(DeserializeError::InvalidMarker))?) {
             Marker::PositiveFixInt(n) => Ok(Value::UInt8(n)),
