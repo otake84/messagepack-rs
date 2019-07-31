@@ -1,3 +1,5 @@
+pub mod stream;
+
 use crate::binary::Binary;
 use crate::marker::Marker;
 use byteorder::{BigEndian, ReadBytesExt, WriteBytesExt};
