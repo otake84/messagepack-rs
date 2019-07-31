@@ -1,4 +1,4 @@
-use crate::value::Value;
+use crate::deserializable::Deserializable;
 use std::io::{BufRead, BufReader, Read, Seek, SeekFrom};
 
 pub struct Deserializer<R: Read + Seek>(BufReader<R>);
@@ -15,11 +15,12 @@ impl<R: Read + Seek> Deserializer<R> {
         Deserializer(buf_reader)
     }
 
-    pub fn deserialize(mut self, f: fn(Value, u64) -> ()) -> Result<(), Error> {
+    pub fn deserialize<T: Deserializable>(mut self, f: fn(T, u64) -> ()) -> Result<(), Error> {
         while !self.0.fill_buf().or(Err(Error::FailedToFillBuf))?.is_empty() {
             let position = self.0.seek(SeekFrom::Current(0)).or(Err(Error::FailedToSeek))?;
-            Value::deserialize(&mut self.0).map(|v| f(v, position)).or(Err(Error::FailedToDeserialize(position)))?;
+            T::deserialize(&mut self.0).map(|v| f(v, position)).or(Err(Error::FailedToDeserialize(position)))?;
         }
         Ok(())
     }
 }
+

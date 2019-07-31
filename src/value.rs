@@ -1,6 +1,5 @@
-pub mod stream;
-
 use crate::binary::Binary;
+use crate::deserializable::{Deserializable, DeserializeError};
 use crate::marker::Marker;
 use crate::serializable::{Serializable, SerializeError};
 use byteorder::{BigEndian, ReadBytesExt, WriteBytesExt};
@@ -29,13 +28,6 @@ pub enum Value {
     Map(BTreeMap<String, Self>),
     Extension(i8, Vec<u8>),
     Timestamp(DateTime<Utc>),
-}
-
-#[derive(Debug)]
-pub enum DeserializeError {
-    InvalidLength,
-    InvalidMarker,
-    InvalidValue,
 }
 
 impl Serializable for Value {
@@ -399,8 +391,8 @@ impl Serializable for Value {
     }
 }
 
-impl Value {
-    pub fn deserialize<R: Read>(buf_reader: &mut BufReader<R>) -> Result<Self, DeserializeError> {
+impl Deserializable for Value {
+    fn deserialize<R: Read>(buf_reader: &mut BufReader<R>) -> Result<Self, DeserializeError> {
         match Marker::from(buf_reader.read_u8().or(Err(DeserializeError::InvalidMarker))?) {
             Marker::PositiveFixInt(n) => Ok(Value::UInt8(n)),
             Marker::FixMap(n) => Self::deserialize_map(n as usize, buf_reader),
@@ -441,7 +433,9 @@ impl Value {
             Marker::NegativeFixInt(n) => Ok(Value::Int8(n)),
         }
     }
+}
 
+impl Value {
     fn deserialize_binary<R: Read>(size: usize, buf_reader: &mut BufReader<R>) -> Result<Self, DeserializeError> {
         let mut buf = Vec::with_capacity(size);
         unsafe { buf.set_len(size); }
@@ -512,6 +506,7 @@ impl Value {
             Ok(Value::Extension(t, buf))
         }
     }
+
 }
 
 impl<T: Into<Value>> From<Option<T>> for Value {

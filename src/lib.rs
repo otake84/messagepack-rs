@@ -1,4 +1,5 @@
 pub mod binary;
+pub mod deserializable;
 pub mod marker;
 pub mod serializable;
 pub mod stream;
