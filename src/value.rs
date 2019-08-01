@@ -6,7 +6,7 @@ use byteorder::{BigEndian, ReadBytesExt, WriteBytesExt};
 use chrono::prelude::*;
 use std::collections::BTreeMap;
 use std::convert::{From, Into};
-use std::io::{BufReader, Read, Write};
+use std::io::{BufReader, Read, Seek, Write};
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Value {
@@ -392,7 +392,7 @@ impl Serializable for Value {
 }
 
 impl Deserializable for Value {
-    fn deserialize<R: Read>(buf_reader: &mut BufReader<R>) -> Result<Self, DeserializeError> {
+    fn deserialize<R: Read + Seek>(buf_reader: &mut BufReader<R>) -> Result<Self, DeserializeError> {
         match Marker::from(buf_reader.read_u8().or(Err(DeserializeError::InvalidMarker))?) {
             Marker::PositiveFixInt(n) => Ok(Value::UInt8(n)),
             Marker::FixMap(n) => Self::deserialize_map(n as usize, buf_reader),
@@ -436,21 +436,21 @@ impl Deserializable for Value {
 }
 
 impl Value {
-    fn deserialize_binary<R: Read>(size: usize, buf_reader: &mut BufReader<R>) -> Result<Self, DeserializeError> {
+    fn deserialize_binary<R: Read + Seek>(size: usize, buf_reader: &mut BufReader<R>) -> Result<Self, DeserializeError> {
         let mut buf = Vec::with_capacity(size);
         unsafe { buf.set_len(size); }
         buf_reader.read_exact(&mut buf[..]).or(Err(DeserializeError::InvalidValue))?;
         Ok(Value::Binary(Binary(buf)))
     }
 
-    fn deserialize_string<R: Read>(size: usize, buf_reader: &mut BufReader<R>) -> Result<Self, DeserializeError> {
+    fn deserialize_string<R: Read + Seek>(size: usize, buf_reader: &mut BufReader<R>) -> Result<Self, DeserializeError> {
         let mut buf = Vec::with_capacity(size);
         unsafe { buf.set_len(size); }
         buf_reader.read_exact(&mut buf).or(Err(DeserializeError::InvalidValue))?;
         Ok(Value::String(String::from_utf8(buf).or(Err(DeserializeError::InvalidValue))?))
     }
 
-    fn deserialize_array<R: Read>(size: usize, buf_reader: &mut BufReader<R>) -> Result<Self, DeserializeError> {
+    fn deserialize_array<R: Read + Seek>(size: usize, buf_reader: &mut BufReader<R>) -> Result<Self, DeserializeError> {
         let mut buf = Vec::with_capacity(size);
         for _ in 0..size {
             buf.push(Self::deserialize(buf_reader)?);
@@ -458,7 +458,7 @@ impl Value {
         Ok(Value::Array(buf))
     }
 
-    fn deserialize_map<R: Read>(size: usize, buf_reader: &mut BufReader<R>) -> Result<Self, DeserializeError> {
+    fn deserialize_map<R: Read + Seek>(size: usize, buf_reader: &mut BufReader<R>) -> Result<Self, DeserializeError> {
         let mut buf = BTreeMap::new();
 
         fn deserialize_string_primitive<R: Read>(buf_reader: &mut BufReader<R>) -> Result<String, DeserializeError> {
@@ -480,7 +480,7 @@ impl Value {
         Ok(Value::Map(buf))
     }
 
-    fn deserialize_extension<R: Read>(size: usize, buf_reader: &mut BufReader<R>) -> Result<Self, DeserializeError> {
+    fn deserialize_extension<R: Read + Seek>(size: usize, buf_reader: &mut BufReader<R>) -> Result<Self, DeserializeError> {
         let t = buf_reader.read_i8().or(Err(DeserializeError::InvalidLength))?;
 
         if t == -1 {

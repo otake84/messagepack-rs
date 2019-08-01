@@ -1,4 +1,4 @@
-use std::io::{BufReader, Read};
+use std::io::{BufReader, Read, Seek};
 
 #[derive(Debug)]
 pub enum DeserializeError {
@@ -8,5 +8,5 @@ pub enum DeserializeError {
 }
 
 pub trait Deserializable: Sized {
-    fn deserialize<R: Read>(buf_reader: &mut BufReader<R>) -> Result<Self, DeserializeError>;
+    fn deserialize<R: Read + Seek>(buf_reader: &mut BufReader<R>) -> Result<Self, DeserializeError>;
 }
