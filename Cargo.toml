@@ -13,3 +13,7 @@ chrono = "0.4.7"
 [[example]]
 name = "basic"
 path = "examples/basic.rs"
+
+[[example]]
+name = "stream"
+path = "examples/stream.rs"
