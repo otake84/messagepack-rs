@@ -371,14 +371,6 @@ impl Value {
         Ok(Value::String(String::from_utf8(buf).or(Err(DeserializeError::InvalidValue))?))
     }
 
-    fn deserialize_array<R: Read + Seek>(size: usize, buf_reader: &mut BufReader<R>) -> Result<Self, DeserializeError> {
-        let mut buf = Vec::with_capacity(size);
-        for _ in 0..size {
-            buf.push(Self::deserialize(buf_reader)?);
-        }
-        Ok(Value::Array(buf))
-    }
-
     fn deserialize_map<R: Read + Seek>(size: usize, buf_reader: &mut BufReader<R>) -> Result<Self, DeserializeError> {
         let mut buf = BTreeMap::new();
 
