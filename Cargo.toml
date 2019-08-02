@@ -21,3 +21,7 @@ path = "examples/stream.rs"
 [[example]]
 name = "extension1"
 path = "examples/extension1.rs"
+
+[[example]]
+name = "extension2"
+path = "examples/extension2.rs"
