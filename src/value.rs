@@ -126,7 +126,7 @@ impl Serializable for Value {
                 }
             },
             Value::Int8(v) => {
-                if v >= -32 && v <= -1 {
+                if v >= -32 && v <= 0 {
                     let mut w = Vec::with_capacity(1);
                     w.write_i8(v).or(Err(SerializeError::FailedToWrite))?;
                     Ok(w)
@@ -138,7 +138,7 @@ impl Serializable for Value {
                 }
             },
             Value::Int16(v) => {
-                if v >= -32 && v <= -1 {
+                if v >= -32 && v <= 0 {
                     let mut w = Vec::with_capacity(1);
                     w.write_i8(v as i8).or(Err(SerializeError::FailedToWrite))?;
                     Ok(w)
@@ -155,7 +155,7 @@ impl Serializable for Value {
                 }
             },
             Value::Int32(v) => {
-                if v >= -32 && v <= -1 {
+                if v >= -32 && v <= 0 {
                     let mut w = Vec::with_capacity(1);
                     w.write_i8(v as i8).or(Err(SerializeError::FailedToWrite))?;
                     Ok(w)
@@ -177,7 +177,7 @@ impl Serializable for Value {
                 }
             },
             Value::Int64(v) => {
-                if v >= -32 && v <= -1 {
+                if v >= -32 && v <= 0 {
                     let mut w = Vec::with_capacity(1);
                     w.write_i8(v as i8).or(Err(SerializeError::FailedToWrite))?;
                     Ok(w)
