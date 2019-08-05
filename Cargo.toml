@@ -2,6 +2,12 @@
 name = "messagepack-rs"
 version = "0.1.0"
 authors = ["Shogo Otake <shogo.otake@gmail.com>"]
+license = "MIT"
+description = "messagepack-rs is pure Rust MessagePack implementation"
+repository = "https://github.com/otake84/messagepack-rs"
+readme = "README.md"
+keywords = ["msgpack", "MessagePack"]
+categories = ["encoding"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
