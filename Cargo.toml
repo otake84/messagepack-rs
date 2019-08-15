@@ -1,6 +1,6 @@
 [package]
 name = "messagepack-rs"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Shogo Otake <shogo.otake@gmail.com>"]
 license = "MIT"
 description = "messagepack-rs is pure Rust MessagePack implementation"
