@@ -17,42 +17,42 @@ struct Rgba {
 #[derive(Clone, Debug, PartialEq)]
 enum MyValue {
     Value(Value),
-    Array(Vec<MyValue>),
-    Map(BTreeMap<String, MyValue>),
+    Array(Vec<Self>),
+    Map(BTreeMap<String, Self>),
     Rgba(Rgba),
 }
 
 impl From<Value> for MyValue {
     fn from(value: Value) -> Self {
-        MyValue::Value(value)
+        Self::Value(value)
     }
 }
 
 impl From<Rgba> for MyValue {
     fn from(value: Rgba) -> Self {
-        MyValue::Rgba(value)
+        Self::Rgba(value)
     }
 }
 
-impl From<Vec<MyValue>> for MyValue {
-    fn from(value: Vec<MyValue>) -> Self {
-        MyValue::Array(value)
+impl From<Vec<Self>> for MyValue {
+    fn from(value: Vec<Self>) -> Self {
+        Self::Array(value)
     }
 }
 
-impl From<BTreeMap<String, MyValue>> for MyValue {
-    fn from(value: BTreeMap<String, MyValue>) -> Self {
-        MyValue::Map(value)
+impl From<BTreeMap<String, Self>> for MyValue {
+    fn from(value: BTreeMap<String, Self>) -> Self {
+        Self::Map(value)
     }
 }
 
 impl Serializable for MyValue {
     fn serialize(self) -> Result<Vec<u8>, SerializeError> {
         match self {
-            MyValue::Value(v) => v.serialize(),
-            MyValue::Array(v) => Self::serialize_array(v),
-            MyValue::Map(v) => Self::serialize_map(v),
-            MyValue::Rgba(v) => {
+            Self::Value(v) => v.serialize(),
+            Self::Array(v) => Self::serialize_array(v),
+            Self::Map(v) => Self::serialize_map(v),
+            Self::Rgba(v) => {
                 let mut w = Vec::with_capacity(1 + 1 + 4);
                 w.write_u8(Marker::FixExt4.into()).or(Err(SerializeError::FailedToWrite))?;
                 w.write_i8(0).or(Err(SerializeError::FailedToWrite))?;
@@ -86,12 +86,12 @@ impl Deserializable for MyValue {
                     }))
                 } else {
                     buf_reader.seek(SeekFrom::Current(-2)).or(Err(DeserializeError::InvalidMarker))?;
-                    Ok(MyValue::from(Value::deserialize(buf_reader)?))
+                    Ok(Self::from(Value::deserialize(buf_reader)?))
                 }
             },
             _ => {
                 buf_reader.seek(SeekFrom::Current(-1)).or(Err(DeserializeError::InvalidMarker))?;
-                Ok(MyValue::from(Value::deserialize(buf_reader)?))
+                Ok(Self::from(Value::deserialize(buf_reader)?))
             }
         }
     }

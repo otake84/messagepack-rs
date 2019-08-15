@@ -33,21 +33,21 @@ pub enum Value {
 impl Serializable for Value {
     fn serialize(self) -> Result<Vec<u8>, SerializeError> {
         match self {
-            Value::Nil => Ok(vec![Marker::Nil.into()]),
-            Value::Bool(v) => Ok(if v { vec![Marker::True.into()] } else { vec![Marker::False.into()] }),
-            Value::Float32(v) => {
+            Self::Nil => Ok(vec![Marker::Nil.into()]),
+            Self::Bool(v) => Ok(if v { vec![Marker::True.into()] } else { vec![Marker::False.into()] }),
+            Self::Float32(v) => {
                 let mut w = Vec::with_capacity(1 + 4);
                 w.write_u8(Marker::Float32.into()).or(Err(SerializeError::FailedToWrite))?;
                 w.write_f32::<BigEndian>(v).or(Err(SerializeError::FailedToWrite))?;
                 Ok(w)
             },
-            Value::Float64(v) => {
+            Self::Float64(v) => {
                 let mut w = Vec::with_capacity(1 + 8);
                 w.write_u8(Marker::Float64.into()).or(Err(SerializeError::FailedToWrite))?;
                 w.write_f64::<BigEndian>(v).or(Err(SerializeError::FailedToWrite))?;
                 Ok(w)
             },
-            Value::UInt8(v) => {
+            Self::UInt8(v) => {
                 if v < 0b1000_0000 {
                     let mut w = Vec::with_capacity(1);
                     w.write_u8(v).or(Err(SerializeError::FailedToWrite))?;
@@ -59,7 +59,7 @@ impl Serializable for Value {
                     Ok(w)
                 }
             },
-            Value::UInt16(v) => {
+            Self::UInt16(v) => {
                 if v < 0b1000_0000 {
                     let mut w = Vec::with_capacity(1);
                     w.write_u8(v as u8).or(Err(SerializeError::FailedToWrite))?;
@@ -76,7 +76,7 @@ impl Serializable for Value {
                     Ok(w)
                 }
             },
-            Value::UInt32(v) => {
+            Self::UInt32(v) => {
                 if v < 0b1000_0000 {
                     let mut w = Vec::with_capacity(1);
                     w.write_u8(v as u8).or(Err(SerializeError::FailedToWrite))?;
@@ -98,7 +98,7 @@ impl Serializable for Value {
                     Ok(w)
                 }
             },
-            Value::UInt64(v) => {
+            Self::UInt64(v) => {
                 if v < 0b1000_0000 {
                     let mut w = Vec::with_capacity(1);
                     w.write_u8(v as u8).or(Err(SerializeError::FailedToWrite))?;
@@ -125,7 +125,7 @@ impl Serializable for Value {
                     Ok(w)
                 }
             },
-            Value::Int8(v) => {
+            Self::Int8(v) => {
                 if v >= -0b0010_0000 {
                     let mut w = Vec::with_capacity(1);
                     w.write_i8(v).or(Err(SerializeError::FailedToWrite))?;
@@ -137,7 +137,7 @@ impl Serializable for Value {
                     Ok(w)
                 }
             },
-            Value::Int16(v) => {
+            Self::Int16(v) => {
                 if v >= -0b0010_0000 {
                     let mut w = Vec::with_capacity(1);
                     w.write_i8(v as i8).or(Err(SerializeError::FailedToWrite))?;
@@ -154,7 +154,7 @@ impl Serializable for Value {
                     Ok(w)
                 }
             },
-            Value::Int32(v) => {
+            Self::Int32(v) => {
                 if v >= -0b0010_0000 {
                     let mut w = Vec::with_capacity(1);
                     w.write_i8(v as i8).or(Err(SerializeError::FailedToWrite))?;
@@ -176,7 +176,7 @@ impl Serializable for Value {
                     Ok(w)
                 }
             },
-            Value::Int64(v) => {
+            Self::Int64(v) => {
                 if v >= -0b0010_0000 {
                     let mut w = Vec::with_capacity(1);
                     w.write_i8(v as i8).or(Err(SerializeError::FailedToWrite))?;
@@ -203,7 +203,7 @@ impl Serializable for Value {
                     Ok(w)
                 }
             },
-            Value::Binary(v) => {
+            Self::Binary(v) => {
                 let mut w = match v.0.len() {
                     len if u8::max_value() as usize >= len => {
                         let mut w = Vec::with_capacity(1 + 1 + len);
@@ -228,10 +228,10 @@ impl Serializable for Value {
                 w.write_all(&v.0).or(Err(SerializeError::FailedToWrite))?;
                 Ok(w)
             },
-            Value::String(v) => Self::serialize_string(v),
-            Value::Array(v) => Self::serialize_array(v),
-            Value::Map(v) => Self::serialize_map(v),
-            Value::Extension(t, mut v) => {
+            Self::String(v) => Self::serialize_string(v),
+            Self::Array(v) => Self::serialize_array(v),
+            Self::Map(v) => Self::serialize_map(v),
+            Self::Extension(t, mut v) => {
                 let mut w = match v.len() {
                     1 => {
                         let mut w = Vec::with_capacity(1 + 1 + 1);
@@ -282,7 +282,7 @@ impl Serializable for Value {
                 w.append(&mut v);
                 Ok(w)
             },
-            Value::Timestamp(v) => {
+            Self::Timestamp(v) => {
                 if v.timestamp() >> 34 == 0 {
                     let value = (u64::from(v.timestamp_subsec_nanos()) << 34) | (v.timestamp() as u64);
                     if value & 0xff_ff_ff_ff_00_00_00_00 == 0 {
@@ -408,108 +408,108 @@ impl<T: Into<Value>> From<Option<T>> for Value {
 
 impl From<bool> for Value {
     fn from(value: bool) -> Self {
-        Value::Bool(value)
+        Self::Bool(value)
     }
 }
 
 impl From<f32> for Value {
     fn from(value: f32) -> Self {
-        Value::Float32(value)
+        Self::Float32(value)
     }
 }
 
 impl From<f64> for Value {
     fn from(value: f64) -> Self {
-        Value::Float64(value)
+        Self::Float64(value)
     }
 }
 
 impl From<u8> for Value {
     fn from(value: u8) -> Self {
-        Value::UInt8(value)
+        Self::UInt8(value)
     }
 }
 
 impl From<u16> for Value {
     fn from(value: u16) -> Self {
-        Value::UInt16(value)
+        Self::UInt16(value)
     }
 }
 
 impl From<u32> for Value {
     fn from(value: u32) -> Self {
-        Value::UInt32(value)
+        Self::UInt32(value)
     }
 }
 
 impl From<u64> for Value {
     fn from(value: u64) -> Self {
-        Value::UInt64(value)
+        Self::UInt64(value)
     }
 }
 
 impl From<i8> for Value {
     fn from(value: i8) -> Self {
-        Value::Int8(value)
+        Self::Int8(value)
     }
 }
 
 impl From<i16> for Value {
     fn from(value: i16) -> Self {
-        Value::Int16(value)
+        Self::Int16(value)
     }
 }
 
 impl From<i32> for Value {
     fn from(value: i32) -> Self {
-        Value::Int32(value)
+        Self::Int32(value)
     }
 }
 
 impl From<i64> for Value {
     fn from(value: i64) -> Self {
-        Value::Int64(value)
+        Self::Int64(value)
     }
 }
 
 impl From<String> for Value {
     fn from(value: String) -> Self {
-        Value::String(value)
+        Self::String(value)
     }
 }
 
 impl From<Binary> for Value {
     fn from(value: Binary) -> Self {
-        Value::Binary(value)
+        Self::Binary(value)
     }
 }
 
 impl From<&str> for Value {
     fn from(value: &str) -> Self {
-        Value::String(String::from(value))
+        Self::String(String::from(value))
     }
 }
 
 impl From<Vec<Self>> for Value {
     fn from(value: Vec<Self>) -> Self {
-        Value::Array(value)
+        Self::Array(value)
     }
 }
 
 impl From<&[Self]> for Value {
     fn from(value: &[Self]) -> Self {
-        Value::Array(Vec::from(value))
+        Self::Array(Vec::from(value))
     }
 }
 
 impl From<BTreeMap<String, Self>> for Value {
     fn from(value: BTreeMap<String, Self>) -> Self {
-        Value::Map(value)
+        Self::Map(value)
     }
 }
 
 impl From<DateTime<Utc>> for Value {
     fn from(value: DateTime<Utc>) -> Self {
-        Value::Timestamp(value)
+        Self::Timestamp(value)
     }
 }

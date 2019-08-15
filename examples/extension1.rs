@@ -13,7 +13,7 @@ struct Rgba {
 
 impl From<Rgba> for Value {
     fn from(value: Rgba) -> Self {
-        Value::Extension(0, vec![value.r, value.g, value.b, value.a])
+        Self::Extension(0, vec![value.r, value.g, value.b, value.a])
     }
 }
 
