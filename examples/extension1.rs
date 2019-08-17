@@ -1,4 +1,5 @@
 use messagepack_rs::deserializable::Deserializable;
+use messagepack_rs::extension::Extension;
 use messagepack_rs::serializable::Serializable;
 use messagepack_rs::value::Value;
 use std::io::{BufReader, Cursor};
@@ -13,7 +14,7 @@ struct Rgba {
 
 impl From<Rgba> for Value {
     fn from(value: Rgba) -> Self {
-        Self::Extension(0, vec![value.r, value.g, value.b, value.a])
+        Self::Extension(Extension { t: 0, data: vec![value.r, value.g, value.b, value.a] })
     }
 }
 
