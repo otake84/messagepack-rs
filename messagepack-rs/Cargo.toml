@@ -13,7 +13,7 @@ edition = "2018"
 [dependencies]
 byteorder = "1.3.2"
 chrono = "0.4.7"
-messagepack-rs-macros = { path = "../messagepack-rs-macros"}
+messagepack-rs-macros = { version = "0.1.0", path = "../messagepack-rs-macros"}
 
 [[example]]
 name = "basic"
