@@ -15,6 +15,6 @@ fn main() {
 
     let buf_reader = BufReader::new(Cursor::new(stream_serializer.get_ref()));
     let stream_deserializer = messagepack_rs::stream::deserializer::Deserializer::new(buf_reader);
-    let result = stream_deserializer.deserialize::<Value>(|value, position| println!("value: {:?}, positoin: {}", value, position));
+    let result = stream_deserializer.deserialize::<Value, _>(|value, position| println!("value: {:?}, positoin: {}", value, position));
     println!("{:?}", result);
 }
