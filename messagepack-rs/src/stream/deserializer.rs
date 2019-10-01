@@ -23,4 +23,3 @@ impl<R: Read + Seek> Deserializer<R> {
         Ok(())
     }
 }
-

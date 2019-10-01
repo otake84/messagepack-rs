@@ -20,4 +20,3 @@ impl<W: Write> Serializer<W> {
         self.0.flush()
     }
 }
-
