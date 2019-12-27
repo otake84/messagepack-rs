@@ -7,7 +7,7 @@ use messagepack_rs::marker::Marker;
 use messagepack_rs::serializable::{Serializable, SerializeError};
 use messagepack_rs_macros::MessagePackFrom;
 use std::collections::BTreeMap;
-use std::io::{BufReader, Cursor, Read, Seek};
+use std::io::{BufReader, Cursor, Read};
 
 #[derive(Clone, Debug, PartialEq)]
 struct Rgba {
@@ -82,7 +82,7 @@ impl Serializable for MyValue {
 }
 
 impl Deserializable for MyValue {
-    fn deserialize_extension_for_the_you_type_defined<R: Read + Seek>(t: i8, size: usize, buf_reader: &mut BufReader<R>) -> Result<Self, DeserializeError> {
+    fn deserialize_extension_for_the_you_type_defined<R: Read>(t: i8, size: usize, buf_reader: &mut R) -> Result<Self, DeserializeError> {
         if t == 0 {
             Ok(From::from(Rgba {
                 r: buf_reader.read_u8().or(Err(DeserializeError::InvalidValue))?,

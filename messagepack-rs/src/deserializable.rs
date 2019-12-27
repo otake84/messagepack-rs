@@ -4,7 +4,7 @@ use crate::binary::Binary;
 use crate::extension::Extension;
 use crate::marker::Marker;
 use std::collections::BTreeMap;
-use std::io::{BufReader, Read, Seek};
+use std::io::Read;
 
 #[derive(Debug)]
 pub enum DeserializeError {
@@ -14,7 +14,7 @@ pub enum DeserializeError {
 }
 
 pub trait Deserializable: Sized + From<Option<Self>> + From<bool> + From<Binary> + From<f32> + From<f64> + From<u8> + From<u16> + From<u32> + From<u64> + From<i8> + From<i16> + From<i32> + From<i64> + From<String> + From<Vec<Self>> + From<BTreeMap<String, Self>> + From<Extension> + From<DateTime<Utc>> {
-    fn deserialize<R: Read + Seek>(buf_reader: &mut BufReader<R>) -> Result<Self, DeserializeError> {
+    fn deserialize<R: Read>(buf_reader: &mut R) -> Result<Self, DeserializeError> {
         match Marker::from(buf_reader.read_u8().or(Err(DeserializeError::InvalidMarker))?) {
             Marker::PositiveFixInt(n) => Ok(Self::from(n)),
             Marker::FixMap(n) => Self::deserialize_map(n as usize, buf_reader),
@@ -56,21 +56,21 @@ pub trait Deserializable: Sized + From<Option<Self>> + From<bool> + From<Binary>
         }
     }
 
-    fn deserialize_binary<R: Read + Seek>(size: usize, buf_reader: &mut BufReader<R>) -> Result<Self, DeserializeError> {
+    fn deserialize_binary<R: Read>(size: usize, buf_reader: &mut R) -> Result<Self, DeserializeError> {
         let mut buf = Vec::with_capacity(size);
         unsafe { buf.set_len(size); }
         buf_reader.read_exact(&mut buf[..]).or(Err(DeserializeError::InvalidValue))?;
         Ok(From::from(Binary(buf)))
     }
 
-    fn deserialize_string<R: Read + Seek>(size: usize, buf_reader: &mut BufReader<R>) -> Result<Self, DeserializeError> {
+    fn deserialize_string<R: Read>(size: usize, buf_reader: &mut R) -> Result<Self, DeserializeError> {
         let mut buf = Vec::with_capacity(size);
         unsafe { buf.set_len(size); }
         buf_reader.read_exact(&mut buf).or(Err(DeserializeError::InvalidValue))?;
         Ok(From::from(String::from_utf8(buf).or(Err(DeserializeError::InvalidValue))?))
     }
 
-    fn deserialize_array<R: Read + Seek>(size: usize, buf_reader: &mut BufReader<R>) -> Result<Self, DeserializeError> {
+    fn deserialize_array<R: Read>(size: usize, buf_reader: &mut R) -> Result<Self, DeserializeError> {
         let mut buf = Vec::with_capacity(size);
         for _ in 0..size {
             buf.push(Self::deserialize(buf_reader)?);
@@ -78,8 +78,8 @@ pub trait Deserializable: Sized + From<Option<Self>> + From<bool> + From<Binary>
         Ok(From::from(buf))
     }
 
-    fn deserialize_map<R: Read + Seek>(size: usize, buf_reader: &mut BufReader<R>) -> Result<Self, DeserializeError> {
-        fn deserialize_string_primitive<R: Read>(buf_reader: &mut BufReader<R>) -> Result<String, DeserializeError> {
+    fn deserialize_map<R: Read>(size: usize, buf_reader: &mut R) -> Result<Self, DeserializeError> {
+        fn deserialize_string_primitive<R: Read>(buf_reader: &mut R) -> Result<String, DeserializeError> {
             let mut buf = match From::from(buf_reader.read_u8().or(Err(DeserializeError::InvalidMarker))?) {
                 Marker::FixStr(n) => Vec::with_capacity(n as usize),
                 Marker::Str8 => Vec::with_capacity(buf_reader.read_u8().or(Err(DeserializeError::InvalidLength))? as usize),
@@ -99,7 +99,7 @@ pub trait Deserializable: Sized + From<Option<Self>> + From<bool> + From<Binary>
         Ok(From::from(buf))
     }
 
-    fn deserialize_extension<R: Read + Seek>(size: usize, buf_reader: &mut BufReader<R>) -> Result<Self, DeserializeError> {
+    fn deserialize_extension<R: Read>(size: usize, buf_reader: &mut R) -> Result<Self, DeserializeError> {
         let t = buf_reader.read_i8().or(Err(DeserializeError::InvalidLength))?;
 
         if t == -1 {
@@ -123,11 +123,11 @@ pub trait Deserializable: Sized + From<Option<Self>> + From<bool> + From<Binary>
         }
     }
 
-    fn deserialize_extension_for_the_you_type_defined<R: Read + Seek>(t: i8, size: usize, buf_reader: &mut BufReader<R>) -> Result<Self, DeserializeError> {
+    fn deserialize_extension_for_the_you_type_defined<R: Read>(t: i8, size: usize, buf_reader: &mut R) -> Result<Self, DeserializeError> {
         Self::deserialize_extension_others(t, size, buf_reader)
     }
 
-    fn deserialize_extension_others<R: Read + Seek>(t: i8, size: usize, buf_reader: &mut BufReader<R>) -> Result<Self, DeserializeError> {
+    fn deserialize_extension_others<R: Read>(t: i8, size: usize, buf_reader: &mut R) -> Result<Self, DeserializeError> {
         let mut data = Vec::with_capacity(size);
         unsafe { data.set_len(size); }
         buf_reader.read_exact(&mut data[..]).or(Err(DeserializeError::InvalidValue))?;
