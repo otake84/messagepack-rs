@@ -2,7 +2,7 @@ use crate::deserializable::Deserializable;
 use std::io::{BufRead, BufReader, Read, Seek, SeekFrom};
 use std::marker::PhantomData;
 
-pub struct Deserializer<D: Deserializable, R: Read + Seek> {
+pub struct Deserializer<D: Deserializable, R: Read> {
     buf_reader: BufReader<R>,
     phantom: PhantomData<D>,
 }
@@ -14,9 +14,9 @@ pub enum Error {
     FailedToSeek,
 }
 
-impl<D: Deserializable, R: Read + Seek> Deserializer<D, R> {
-    pub fn new(buf_reader: BufReader<R>) -> Self {
-        Deserializer { buf_reader, phantom: PhantomData::<D> }
+impl<D: Deserializable, R: Read> Deserializer<D, R> {
+    pub fn new(reader: R) -> Self {
+        Deserializer { buf_reader: BufReader::new(reader), phantom: PhantomData::<D> }
     }
 }
 
