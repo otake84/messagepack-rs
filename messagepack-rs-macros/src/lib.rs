@@ -1,3 +1,5 @@
+#![forbid(unsafe_code)]
+
 extern crate proc_macro;
 
 use crate::proc_macro::TokenStream;
@@ -135,4 +137,3 @@ fn impl_message_pack_from_macro(ast: &syn::DeriveInput) -> TokenStream {
     };
     gen.into()
 }
-

@@ -1,6 +1,6 @@
 [package]
 name = "messagepack-rs"
-version = "0.8.0"
+version = "0.8.1"
 authors = ["Shogo Otake <shogo.otake@gmail.com>"]
 license = "MIT"
 description = "messagepack-rs is pure Rust MessagePack implementation"
@@ -13,7 +13,7 @@ edition = "2018"
 [dependencies]
 byteorder = "1.3.2"
 chrono = "0.4.9"
-messagepack-rs-macros = { version = "0.1.1", path = "../messagepack-rs-macros"}
+messagepack-rs-macros = { version = "0.1.2", path = "../messagepack-rs-macros"}
 
 [[example]]
 name = "basic"

@@ -57,15 +57,13 @@ pub trait Deserializable: Sized + From<Option<Self>> + From<bool> + From<Binary>
     }
 
     fn deserialize_binary<R: Read>(size: usize, buf_reader: &mut R) -> Result<Self, DeserializeError> {
-        let mut buf = Vec::with_capacity(size);
-        unsafe { buf.set_len(size); }
+        let mut buf = vec![0; size];
         buf_reader.read_exact(&mut buf[..]).or(Err(DeserializeError::InvalidValue))?;
         Ok(From::from(Binary(buf)))
     }
 
     fn deserialize_string<R: Read>(size: usize, buf_reader: &mut R) -> Result<Self, DeserializeError> {
-        let mut buf = Vec::with_capacity(size);
-        unsafe { buf.set_len(size); }
+        let mut buf = vec![0; size];
         buf_reader.read_exact(&mut buf).or(Err(DeserializeError::InvalidValue))?;
         Ok(From::from(String::from_utf8(buf).or(Err(DeserializeError::InvalidValue))?))
     }
@@ -81,13 +79,12 @@ pub trait Deserializable: Sized + From<Option<Self>> + From<bool> + From<Binary>
     fn deserialize_map<R: Read>(size: usize, buf_reader: &mut R) -> Result<Self, DeserializeError> {
         fn deserialize_string_primitive<R: Read>(buf_reader: &mut R) -> Result<String, DeserializeError> {
             let mut buf = match From::from(buf_reader.read_u8().or(Err(DeserializeError::InvalidMarker))?) {
-                Marker::FixStr(n) => Vec::with_capacity(n as usize),
-                Marker::Str8 => Vec::with_capacity(buf_reader.read_u8().or(Err(DeserializeError::InvalidLength))? as usize),
-                Marker::Str16 => Vec::with_capacity(buf_reader.read_u16::<BigEndian>().or(Err(DeserializeError::InvalidLength))? as usize),
-                Marker::Str32 => Vec::with_capacity(buf_reader.read_u32::<BigEndian>().or(Err(DeserializeError::InvalidLength))? as usize),
+                Marker::FixStr(n) => vec![0; n as usize],
+                Marker::Str8 => vec![0; buf_reader.read_u8().or(Err(DeserializeError::InvalidLength))? as usize],
+                Marker::Str16 => vec![0; buf_reader.read_u16::<BigEndian>().or(Err(DeserializeError::InvalidLength))? as usize],
+                Marker::Str32 => vec![0; buf_reader.read_u32::<BigEndian>().or(Err(DeserializeError::InvalidLength))? as usize],
                 _ => Err(DeserializeError::InvalidMarker)?
             };
-            unsafe { buf.set_len(buf.capacity()); }
             buf_reader.read_exact(&mut buf[..]).or(Err(DeserializeError::InvalidValue))?;
             String::from_utf8(buf).or(Err(DeserializeError::InvalidValue))
         }
@@ -128,8 +125,7 @@ pub trait Deserializable: Sized + From<Option<Self>> + From<bool> + From<Binary>
     }
 
     fn deserialize_extension_others<R: Read>(t: i8, size: usize, buf_reader: &mut R) -> Result<Self, DeserializeError> {
-        let mut data = Vec::with_capacity(size);
-        unsafe { data.set_len(size); }
+        let mut data = vec![0; size];
         buf_reader.read_exact(&mut data[..]).or(Err(DeserializeError::InvalidValue))?;
         Ok(From::from(Extension { t, data }))
     }

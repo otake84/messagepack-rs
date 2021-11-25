@@ -5,6 +5,7 @@ messagepack-rs is pure Rust MessagePack implementation.
 - Supports Stream serialization and deserialization
 - Supports Timestamp type (Note: The date range depends on [Chrono](https://github.com/chronotope/chrono))
 - Supports user defined extension types
+- `#![forbid(unsafe_code)]`
 ## Usage
 See [examples](https://github.com/otake84/messagepack-rs/tree/master/messagepack-rs/examples)
 ## Todo
