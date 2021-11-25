@@ -1,3 +1,5 @@
+#![forbid(unsafe_code)]
+
 pub mod binary;
 pub mod deserializable;
 pub mod extension;
